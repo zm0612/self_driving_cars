@@ -271,7 +271,7 @@ We will now run your speed and angular rate inputs through our bicycle model sol
 grade_bicycle(t_data,v_data,w_data)
 ```
 
-The cell below will save the time and vehicle inputs as text file named $\textit{figure8.txt}$. To locate the file, change the end of your web directory to $\textit{/notebooks/Course_1_Module_4/figure8.txt}$
+The cell below will save the time and vehicle inputs as text file named $\textit{figure8.txt}$. To locate the file, change the end of your web directory to _/notebooks/Course_1_Module_4/figure8.txt}_
 
 Once you are there, you can download the file and submit to the Coursera grader to complete this assessment.
 
