@@ -16,14 +16,16 @@ v_data = np.zeros_like(t_data)
 w_data = np.zeros_like(t_data)
 
 R = 8
+max_delta = np.arctan(model_cg.L / R)
+print(max_delta)
 v_data[:] = 2 * np.pi * R * 2 / time_end
 
-w_data[0:0 + 187] = 0.42
-w_data[187:187 * 2] = -0.42
-w_data[187 * 2:187 * 3] = -0.42
-w_data[187 * 3:187 * 4] = 0.42
-w_data[187 * 4:187 * 5] = -0.42
-w_data[187 * 5:187 * 6] = -0.42
+w_data[0: 20] = 1.225
+w_data[375 - 20: 375] = -1.225
+
+w_data[375: 375 + 20] = -1.225
+w_data[1875 - 20: 1875] = 1.225
+w_data[1875: 1875 + 20] = 1.225
 
 for i in range(t_data.shape[0]):
     x_data[i] = model_cg.xc
@@ -32,8 +34,8 @@ for i in range(t_data.shape[0]):
     model_cg.step(v_data[i], w_data[i])
 
 plt.axis('square')
-plt.xlim(-40, 40)
-plt.ylim(-10, 70)
+plt.xlim(-15, 25)
+plt.ylim(-5, 20)
 plt.plot(x_data, y_data, label='Square Path')
 plt.legend()
 plt.show()
