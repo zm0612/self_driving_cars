@@ -1,7 +1,5 @@
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 
 
 class Vehicle:
@@ -62,9 +60,10 @@ class Vehicle:
         x_dot_dot = (F_x - F_load) / self.m
         self.v += x_dot_dot * self.sample_time
         self.w_e += self.w_e_dot * self.sample_time
+        self.x += self.v * self.sample_time
 
 
-def main():
+def test_0():
     sample_time = 0.01
     time_end = 100
     model = Vehicle()
@@ -83,5 +82,36 @@ def main():
     plt.show()
 
 
+def test_1():
+    sample_time = 0.01
+    time_end = 20
+    model = Vehicle()
+    t_data = np.arange(0, time_end, sample_time)
+    x_data = np.zeros_like(t_data)
+    throttle_data = np.zeros_like(t_data)
+
+    for i, t in enumerate(t_data):
+        if t < 5:
+            throttle_data[i] = 0.2 + (0.5 - 0.2) / 5 * t
+        elif t < 15:
+            throttle_data[i] = 0.5
+        else:
+            throttle_data[i] = 0.5 - 0.5 / 5 * (t - 15)
+
+    for i in range(t_data.shape[0]):
+        if model.x < 60:
+            model.step(throttle_data[i], np.arctan(3 / 60))
+        elif model.x < 150:
+            model.step(throttle_data[i], np.arctan(9 / 90))
+        else:
+            model.step(throttle_data[i], 0)
+
+        x_data[i] = model.x
+
+    plt.plot(t_data, x_data)
+    plt.show()
+
+
 if __name__ == '__main__':
-    main()
+    test_0()
+    test_1()
