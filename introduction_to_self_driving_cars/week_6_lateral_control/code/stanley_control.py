@@ -73,11 +73,17 @@ def main():
     T = 200
     target_velocity = 10 / 3.6
 
-    t_x_list = range(0, 50, 1)
-    t_y_list = [i * 0 for i in range(0, 50, 1)]
-    t_theta_list = [i * 0 for i in range(0, 50, 1)]
+    t_x_list = [i * 0.1 for i in range(500)]
+    # 直线
+    # t_y_list = [i * 0 for i in range(0, 500, 1)]
+    # t_theta_list = [i * 0 for i in range(0, 500, 1)]
+    # 曲线
+    t_y_list = [np.sin(t_x / 5.0) * t_x / 2.0 for t_x in t_x_list]
+    t_theta_list = [np.arctan2(t_y_list[i + 1] - t_y_list[i], t_x_list[i + 1] - t_x_list[i])
+                    for i in range(0, len(t_y_list) - 1, 1)]
+    t_theta_list.append(t_theta_list[-1])
 
-    vehicle = VehicleCF(0, -5, -np.pi / 3)
+    vehicle = VehicleCF(0, -3, 0)
 
     last_index = len(t_x_list) - 1
 
@@ -105,7 +111,7 @@ def main():
         plt.plot(t_x_list[target_index], t_y_list[target_index], "go", label="target")
         plt.axis("equal")
         plt.grid(True)
-        plt.title("Speed [km/h]: " + str(vehicle.v * 3.6)[:4])
+        plt.title("Stanley Controller -- Speed [km/h]: " + str(vehicle.v * 3.6)[:4])
         plt.pause(0.001)
 
         if target_index >= last_index:
