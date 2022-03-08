@@ -160,12 +160,15 @@ class Controller2D(object):
                 access the persistent variables declared above here. For
                 example, can treat self.vars.v_previous like a "global variable".
             """
-
             # Change these outputs with the longitudinal controller. Note that
             # brake_output is optional and is not required to pass the
             # assignment, as the car will naturally slow down over time.
             throttle_output = 0
             brake_output = 0
+
+            kp = 2
+            a = kp * (v_desired - self._current_speed)
+            throttle_output = a
 
             ######################################################
             ######################################################
@@ -178,8 +181,27 @@ class Controller2D(object):
                 example, can treat self.vars.v_previous like a "global variable".
             """
 
-            # Change the steer output with the lateral controller. 
+            # Change the steer output with the lateral controller.
             steer_output = 0
+            k = 0.1
+            LFC = 2
+            dx = [self._current_x - waypoint[0] for waypoint in waypoints]
+            dy = [self._current_y - waypoint[1] for waypoint in waypoints]
+            d = [np.abs(np.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+            index = d.index(min(d))
+            L = 0
+            LF = k * self._current_speed + LFC
+
+            while LF > L and (index + 1) < len(waypoints):
+                dx = waypoints[index + 1][0] - waypoints[index][0]
+                dy = waypoints[index + 1][1] - waypoints[index][1]
+                L += np.sqrt(dx ** 2 + dy ** 2)
+                index += 1
+
+            alpha = np.arctan2(waypoints[index][1] - self._current_y,
+                               waypoints[index][0] - self._current_x) - self._current_yaw
+            delta = np.arctan(2 * 3.0 * np.sin(alpha) / (k * (self._current_speed + 1e-5) + LFC))
+            steer_output = delta
 
             ######################################################
             # SET CONTROLS OUTPUT

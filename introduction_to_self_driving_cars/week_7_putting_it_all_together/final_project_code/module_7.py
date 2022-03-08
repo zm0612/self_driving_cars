@@ -602,7 +602,9 @@ def exec_waypoint_nav_demo(args):
                           wp_interp_hash[waypoint_subset_last_index] + 1]
             controller.update_waypoints(new_waypoints)
 
-            # Update the other controller values and controls
+            # Update the other controller values and controlChange these outputs with the longitudinal controller.
+            # Note that brake_output is optional and is not required to pass the # assignment, as the car will
+            # naturally slow down over time.s
             controller.update_values(current_x, current_y, current_yaw,
                                      current_speed,
                                      current_timestamp, frame)
@@ -640,8 +642,7 @@ def exec_waypoint_nav_demo(args):
 
                 # Refresh the live plot based on the refresh rate 
                 # set by the options
-                if enable_live_plot and \
-                        live_plot_timer.has_exceeded_lap_period():
+                if enable_live_plot and live_plot_timer.has_exceeded_lap_period():
                     lp_traj.refresh()
                     lp_1d.refresh()
                     live_plot_timer.lap()
