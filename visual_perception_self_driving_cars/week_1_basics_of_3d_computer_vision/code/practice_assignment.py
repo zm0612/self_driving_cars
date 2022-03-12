@@ -101,3 +101,49 @@ depth_map_left = calc_depth_map(disp_left, k_left, t_left, t_right)
 plt.figure(figsize=(8, 8), dpi=100)
 plt.imshow(depth_map_left, cmap='flag')
 plt.show()
+
+obstacle_image = files_management.get_obstacle_image()
+plt.figure(figsize=(4, 4))
+plt.imshow(obstacle_image)
+plt.show()
+
+
+def locate_obstacle_in_image(image, obstacle_image):
+    cross_correlation_map = cv2.matchTemplate(image, obstacle_image, method=cv2.TM_CCOEFF)
+    _, _, _, obstacle_location = cv2.minMaxLoc(cross_correlation_map)
+
+    return cross_correlation_map, obstacle_location
+
+
+cross_correlation_map, obstacle_location = locate_obstacle_in_image(image_left, obstacle_image)
+plt.figure(figsize=(10, 10))
+plt.imshow(cross_correlation_map)
+plt.show()
+
+
+def calculate_nearest_point(depth_map, obstacle_location, obstacle_img):
+    obstacle_width = obstacle_img.shape[0]
+    obstacle_height = obstacle_img.shape[1]
+    obstacle_min_x_pos = obstacle_location[1]
+    obstacle_max_x_pos = obstacle_location[1] + obstacle_width
+    obstacle_min_y_pos = obstacle_location[0]
+    obstacle_max_y_pos = obstacle_location[0] + obstacle_height
+
+    obstacle_depth = depth_map_left[obstacle_min_x_pos: obstacle_max_x_pos, obstacle_min_y_pos:obstacle_max_y_pos]
+    closest_point_depth = obstacle_depth.min()
+
+    obstacle_bbox = patches.Rectangle((obstacle_min_y_pos, obstacle_min_x_pos), obstacle_height, obstacle_width,
+                                      linewidth=1, edgecolor='r', facecolor='none')
+
+    return closest_point_depth, obstacle_bbox
+
+
+closest_point_depth, obstacle_bbox = calculate_nearest_point(
+    depth_map_left, obstacle_location, obstacle_image
+)
+fig, ax = plt.subplots(1, figsize=(10, 10))
+ax.imshow(image_left)
+ax.add_patch(obstacle_bbox)
+plt.show()
+
+print("closest_point_depth {:0.3f}".format(closest_point_depth))
