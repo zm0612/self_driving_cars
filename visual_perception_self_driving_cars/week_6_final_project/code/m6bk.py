@@ -66,7 +66,7 @@ class DatasetHandler:
 
     def _read_segmentation(self):
         seg_name = self.segmentation_dir + '/' + \
-            str(self.current_frame) + '.dat'
+                   str(self.current_frame) + '.dat'
         self.segmentation = np.loadtxt(seg_name, delimiter=',')
 
     def _read_object_detection(self):
@@ -130,20 +130,13 @@ class DatasetHandler:
     def vis_segmentation(self, segmented_image):
         colored_segmentation = np.zeros(self.image.shape)
 
-        colored_segmentation[segmented_image ==
-                             1] = self.colour_mappings['Buildings']
-        colored_segmentation[segmented_image ==
-                             4] = self.colour_mappings['Pedestrians']
-        colored_segmentation[segmented_image ==
-                             5] = self.colour_mappings['Poles']
-        colored_segmentation[segmented_image ==
-                             6] = self.colour_mappings['RoadLines']
-        colored_segmentation[segmented_image ==
-                             7] = self.colour_mappings['Roads']
-        colored_segmentation[segmented_image ==
-                             8] = self.colour_mappings['Sidewalks']
-        colored_segmentation[segmented_image ==
-                             10] = self.colour_mappings['Vehicles']
+        colored_segmentation[segmented_image == 1] = self.colour_mappings['Buildings']
+        colored_segmentation[segmented_image == 4] = self.colour_mappings['Pedestrians']
+        colored_segmentation[segmented_image == 5] = self.colour_mappings['Poles']
+        colored_segmentation[segmented_image == 6] = self.colour_mappings['RoadLines']
+        colored_segmentation[segmented_image == 7] = self.colour_mappings['Roads']
+        colored_segmentation[segmented_image == 8] = self.colour_mappings['Sidewalks']
+        colored_segmentation[segmented_image == 10] = self.colour_mappings['Vehicles']
 
         return colored_segmentation.astype(np.uint8)
 
@@ -203,7 +196,7 @@ class DatasetHandler:
 
         for x, z, seg in zip(xx.flatten('C'), depth.flatten('C'),
                              segmentation.flatten('C')):
-            if not(seg == 1):
+            if not (seg == 1):
                 if not np.isnan(x) and not np.isnan(z):
                     x = int(x)
                     z = int(z)
@@ -274,13 +267,13 @@ def dist_to_plane(plane, x, y, z):
     """
     a, b, c, d = plane
 
-    return (a * x + b * y + c * z + d) / np.sqrt(a**2 + b**2 + c**2)
+    return (a * x + b * y + c * z + d) / np.sqrt(a ** 2 + b ** 2 + c ** 2)
 
 
 def get_slope_intecept(lines):
     slopes = (lines[:, 3] - lines[:, 1]) / (lines[:, 2] - lines[:, 0] + 0.001)
     intercepts = ((lines[:, 3] + lines[:, 1]) - slopes * (
-        lines[:, 2] + lines[:, 0])) / 2
+            lines[:, 2] + lines[:, 0])) / 2
     return slopes, intercepts
 
 
@@ -303,7 +296,7 @@ def find_closest_lines(lines, point):
     for line in lines:
         x1, y1, x2, y2 = line
         distances.append(((x2 - x1) * (y1 - y0) - (x1 - x0) *
-                          (y2 - y1)) / (np.sqrt((y2 - y1)**2 + (x2 - x1)**2)))
+                          (y2 - y1)) / (np.sqrt((y2 - y1) ** 2 + (x2 - x1) ** 2)))
 
     distances = np.abs(np.array(distances))
     sorted = distances.argsort()
