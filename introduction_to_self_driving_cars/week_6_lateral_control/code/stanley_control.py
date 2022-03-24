@@ -20,14 +20,16 @@ class VehicleCF:
         self.xf += xf_dot * self.sample_time
         self.yf += yf_dot * self.sample_time
         self.theta += theta_dot * self.sample_time
+        self.theta = np.fmod(self.theta, np.pi * 2)
         self.v += a * self.sample_time
 
 
-def stanley_control(vehicle, t_x, t_y, t_theta, k):
+def stanley_control(vehicle, t_x, t_y, t_theta, k, reverse=False):
     """
     Stanley Controller
     refer to: 《Autonomous automobile trajectory tracking for off-road driving:
                 Controller design, experimental validation and racing》
+    :param reverse: Whether to reverse
     :param vehicle:
     :param t_x: reference pose x
     :param t_y: reference pose y
@@ -35,14 +37,18 @@ def stanley_control(vehicle, t_x, t_y, t_theta, k):
     :param k: velocity gain
     :return: steer radius
     """
-    phi = t_theta - vehicle.theta
 
     dx = t_x - vehicle.xf
     dy = t_y - vehicle.yf
-    dist = np.sqrt(dx ** 2 + dy ** 2)
-    e = np.sign(np.sin(np.arctan2(dy, dx) - vehicle.theta)) * dist
+    e = (dx * np.sin(t_theta) - dy * np.cos(t_theta))
 
-    delta = phi + np.arctan(k * e / (vehicle.v + 1e-5))
+    if reverse:
+        phi = -(t_theta - vehicle.theta + np.pi)
+    else:
+        e = -e
+        phi = t_theta - vehicle.theta
+
+    delta = phi + np.arctan(k * e / (np.abs(vehicle.v) + 1e-5))
 
     delta_min = - np.pi / 6
     delta_max = np.pi / 6
@@ -83,7 +89,7 @@ def main():
                     for i in range(0, len(t_y_list) - 1, 1)]
     t_theta_list.append(t_theta_list[-1])
 
-    vehicle = VehicleCF(0, -3, 0)
+    vehicle = VehicleCF(0, 3, np.pi)
 
     last_index = len(t_x_list) - 1
 
@@ -97,7 +103,7 @@ def main():
 
         delta = stanley_control(vehicle, t_x_list[target_index],
                                 t_y_list[target_index],
-                                t_theta_list[target_index], k)
+                                t_theta_list[target_index], k, reverse=False)
 
         vehicle.step(vehicle.v, delta, a)
 
